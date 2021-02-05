@@ -1,0 +1,13 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bibletls
+  namespace: default
+spec:
+  dnsNames:
+    - bible.hopto.org
+  secretName: bibletls-secret
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt

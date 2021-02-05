@@ -1,16 +1,29 @@
 # k8scertificates
 How to use kubenetes to get real tls certificate from let's encrypt
 
-# Make sure that you have already setup gcloud and kubectl and have logged into k8s
-# verify that you can run the following command against your k8s cluster
+Make sure that you have already setup gcloud and kubectl and have logged into k8s
+verify that you can run the following command against your k8s cluster
 
-## 1. Verify connection to your k8s cluster
+## Use the script 
+
+### 1. Download the setup.sh and run the script to set things up
+### 2. Create a certificate
+Use yaml/certificate.yaml as an example to create your own certificate
+file, then run the following command:
+```
+    kubectl apply -f certificate.yaml
+```
+
+
+## Use the step by step approach
+
+### 1. Verify connection to your k8s cluster
 
 ```
     kubectl get nodes
 ```
 
-## 2. Install ambassador
+### 2. Install ambassador
 
 ```
     kubectl apply -f https://www.getambassador.io/yaml/aes-crds.yaml && \
@@ -24,13 +37,13 @@ How to use kubenetes to get real tls certificate from let's encrypt
     "go-template={{range .status.loadBalancer.ingress}}{{or .ip .hostname}}{{end}}"
 ```
 
-## 3. Install cert-manager
+### 3. Install cert-manager
 
 ```
     kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml 
 ```
 
-## 4. Setup resolver mapping and ingress
+### 4. Setup resolver mapping and ingress
 
 Create mappingingress.yaml with the following content:
 
@@ -63,7 +76,7 @@ Now run the following command
     kubectl apply -f mappingingress.yaml
 ```
 
-## 5. Create an issuer (or clusterissuer)
+### 5. Create an issuer (or clusterissuer)
 
 Create issuer.yaml file with the following content
 ```
@@ -89,9 +102,9 @@ Run the following command to create the Cluster Issuer
     kubectl apply -f issuer.yaml
 ```
 
-## 6. Create a certificate
+### 6. Create a certificate
 
-Create certrequest.yaml file with the following content
+Create certificate.yaml file with the following content
 ```
 apiVersion: cert-manager.io/v1
 kind: Certificate
