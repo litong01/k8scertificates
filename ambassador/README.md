@@ -1,5 +1,5 @@
-# k8scertificates
-How to use kubenetes to get real tls certificate from let's encrypt
+# Use ambassador and cert-manager
+How to use ambassador and cert-manager to get real tls certificate from let's encrypt
 
 Make sure that you have already setup gcloud and kubectl and have logged into k8s
 verify that you can run the following command against your k8s cluster
