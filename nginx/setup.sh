@@ -4,6 +4,8 @@
 
 action=$1
 if [[ $action == 'delete' ]]; then
+    echo "Delete the ingress..."
+    kubectl delete -f yaml/ingress.yaml
 
     echo "Removing the certificate issuer..."
     # kubectl delete -f https://raw.githubusercontent.com/litong01/k8scertificates/main/yaml/issuer.yaml
@@ -23,8 +25,7 @@ else
 
     echo ""
     echo "Set up ingress..."
-    # kubectl apply -f yaml/ingress.yaml
-    kubectl apply -f yaml/mappingingress.yaml
+    kubectl apply -f yaml/ingress.yaml
     sleep 10
     echo "Set up the certificate issuer..."
     # kubectl apply -f https://raw.githubusercontent.com/litong01/k8scertificates/main/yaml/issuer.yaml
