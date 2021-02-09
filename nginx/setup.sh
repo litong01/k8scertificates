@@ -4,6 +4,9 @@
 
 action=$1
 if [[ $action == 'delete' ]]; then
+    echo "Delete verification app..."
+    kubectl delete -f yaml/hello-world.yaml
+
     echo "Delete the ingress..."
     kubectl delete -f yaml/ingress.yaml
 
