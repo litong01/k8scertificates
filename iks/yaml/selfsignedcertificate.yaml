@@ -1,0 +1,22 @@
+# Use the annotation below to find ingress for http01 resolver
+# If this is for fabric nodes, the local fabric node name
+# should go under dnsNames section for self-signed certificates
+# the local node IP addresses (which host each k8s cluster) should
+# go under IP address section. The service names should go under
+# dnsNames section.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: peer1-org0-example-com
+  namespace: default
+spec:
+  dnsNames:
+    - peer1.org0.example.com
+  ipAddresses:
+    - 10.240.64.4
+    - 10.240.64.5
+    - 10.240.64.6
+  secretName: peer1-org0-example-com-secret
+  issuerRef:
+    kind: ClusterIssuer
+    name: selfsigned-issuer
