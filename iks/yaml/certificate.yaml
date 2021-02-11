@@ -1,0 +1,15 @@
+# Use the annotation below to find ingress for http01 resolver
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: myddnstls
+  namespace: default
+  annotations:
+    http01.acme.certmanager.k8s.io/ingress-to-edit: "external-balancer"
+spec:
+  dnsNames:
+    - tongli.myddns.me
+  secretName: myddns-secret
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt

@@ -24,3 +24,7 @@ spec:
         backend:
           serviceName: acme-challenge-service
           servicePort: 80
+      - path: /hello
+        backend:
+          serviceName: hello-world
+          servicePort: 80
