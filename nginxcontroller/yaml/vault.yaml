@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hashivault
+  labels:
+    app: hashivault
+spec:
+  serviceName: hashivault
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hashivault
+  template:
+    metadata:
+      labels:
+        app: hashivault
+    spec:
+      terminationGracePeriodSeconds: 1800
+      containers:
+      - name: hashivault-server
+        image: vault:1.6.2
+        imagePullPolicy: Always
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          httpGet:
+            path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+            port: 8200
+        ports:
+        - containerPort: 8200
+          name: intra-node
+        resources:
+          limits:
+            cpu: "500m"
+            memory: 1Gi
+          requests:
+            cpu: "50m"
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        env:
+          - name: MAX_HEAP_SIZE
+            value: 512M
+          - name: HEAP_NEWSIZE
+            value: 100M
+          - name: VAULT_DEV_ROOT_TOKEN_ID
+            value: sscBVAzql3gRCl3gscFVm30WSX
+        volumeMounts:
+        - name: hashivault-data
+          mountPath: /vault/logs
+          subPath: logs
+        - name: hashivault-data
+          mountPath: /vault/file
+          subPath: file
+  # These are converted to volume claims by the controller
+  # and mounted at the paths mentioned above.
+  # do not use these in production until ssd GCEPersistentDisk or other ssd pd
+  volumeClaimTemplates:
+  - metadata:
+      name: hashivault-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hashivault
+  name: hashivault
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    protocol: TCP
+    port: 443
+    targetPort: 8200
+  selector:
+    app: hashivault
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: external-balancer
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+spec:
+  tls:
+  - hosts:
+    - tongli.myddns.me
+    secretName: myddns-secret
+  rules:
+  - host: tongli.myddns.me
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: hashivault
+          servicePort: 443
+#
+# Once everything is working correctly, use the following two urls to
+# further verify that vault is working. Notice, that you must replace
+# the IP address with your actual IP address. The vault token should
+# be provided by the setup process.
+# 
+# To create a kv pair
+# curl -H "X-Vault-Token: sscBVAzql3gRCl3gscFVm30WSX" -H "X-Vault-Request: true" \
+#   -H "Content-Type: application/json" -X POST -d \
+#   '{"value":"bar"}' http://35.243.165.14/v1/cubbyhole/yoursecret
+#
+# To retrieve the kv pair
+# curl -H "X-Vault-Token: sscBVAzql3gRCl3gscFVm30WSX" http://35.243.165.14/v1/cubbyhole/yoursecret

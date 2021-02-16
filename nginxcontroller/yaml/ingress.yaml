@@ -1,0 +1,54 @@
+# This deployment meant to be used as an initial service for the ingress
+# If there are any other services available, this deployment and service
+# are not needed.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-deployment
+spec:
+  selector:
+    matchLabels:
+      greeting: hello
+      department: world
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        greeting: hello
+        department: world
+    spec:
+      containers:
+      - name: hello
+        image: "email4tong/pathecho:latest"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+spec:
+  type: NodePort
+  selector:
+    greeting: hello
+    department: world
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: external-balancer
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /hello/*
+        backend:
+          serviceName: hello-world
+          servicePort: 80
