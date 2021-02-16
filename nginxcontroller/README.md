@@ -105,3 +105,22 @@ metadata:
 
 If not using forwarded-headers annotation, the ingress will default to use the nginx
 default self signed certificate which will not be useful.
+
+## Deploy hashivault
+
+### 1. Make sure that there is tls certificate available
+
+Use the cert manager to request a real certificate, and make sure that the tls certificate
+is saved in the same namespace named `myddns-secret`
+
+### 2. Stand up hashivault secured.
+
+```
+    kubectl apply -f yaml/vault.yaml
+```
+
+### 3. Delete the hasivault
+
+```
+    kubectl delete -f yaml/vault.yaml
+```
