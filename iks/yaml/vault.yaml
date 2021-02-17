@@ -1,9 +1,4 @@
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: default
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -63,7 +58,7 @@ spec:
       name: hashivault-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: ibmc-vpc-block-10iops-tier
+      storageClassName: ibmc-vpc-block-5iops-tier
       resources:
         requests:
           storage: 1Gi
@@ -79,7 +74,7 @@ spec:
   type: NodePort
   ports:
   - protocol: TCP
-    port: 80
+    port: 443
     targetPort: 8200
   selector:
     app: hashivault
@@ -100,21 +95,21 @@ metadata:
   name: external-balancer
   annotations:
     kubernetes.io/ingress.class: "public-iks-k8s-nginx"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
 spec:
+  tls:
+  - hosts:
+    - tongli.myddns.me
+    secretName: myddns-secret
   rules:
-  - http:
+  - host: tongli.myddns.me
+    http:
       paths:
-      - path: /hello/
-        pathType: Prefix
-        backend:
-          service:
-            name: hello-world
-            port:
-              number: 80
-      - path: /v1/
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: hashivault
             port:
-              number: 80
+              number: 443

@@ -5,9 +5,9 @@ metadata:
   name: letsencrypt
 spec:
   acme:
-    # server: https://acme-v02.api.letsencrypt.org/directory
-    # preferredChain: "ISRG Root X1"
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
+    preferredChain: "ISRG Root X1"
+    # server: https://acme-staging-v02.api.letsencrypt.org/directory
     email: email4tong@yahoo.com
     privateKeySecretRef:
       name: letencrypt-secret

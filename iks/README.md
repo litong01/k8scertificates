@@ -83,3 +83,13 @@ Run the following command to create the certificate issued by Letsencrypt
 ```
     kubectl apply -f certrequest.yaml
 ```
+
+### How to get secret from k8s
+
+Use the following command to save the secret (certificate) to files
+
+```
+    kubectl get secrets myddns-secret --template="{{index .data \"tls.crt\" | base64decode}}" > tls.crt
+    kubectl get secrets myddns-secret --template="{{index .data \"tls.key\" | base64decode}}" > tls.key
+
+```
